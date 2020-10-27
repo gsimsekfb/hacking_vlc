@@ -64,6 +64,22 @@
     return self;
 }
 
+- (void) mouseDown:(NSEvent*)theEvent {
+	NSLog(@"\n --- aaa: mouseDown");
+
+    NSPoint event_location = theEvent.locationInWindow;
+    NSPoint local_point = [self convertPoint:event_location fromView:nil];
+    int mouseAt = (int)local_point.x;
+    int width = (int)NSWidth(self.bounds);
+
+   // ---    
+    VLCPlayerController * pc = 
+        [[[VLCMain sharedInstance] playlistController] playerController];
+    vlc_tick_t durSeconds = [pc durationOfCurrentMediaItem]/1000000;
+    vlc_tick_t secToShow = (mouseAt * durSeconds)/width + 1;
+    [pc setTimeFast: 1000000*secToShow];
+}
+
 - (void) mouseMoved:(NSEvent*)theEvent {
 	NSLog(@"\n --- aaa: mouseMoved");
 
