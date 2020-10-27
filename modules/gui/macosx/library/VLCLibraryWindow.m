@@ -111,6 +111,32 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
 
 @implementation VLCLibraryWindow
 
+// vlc-g: Enable playback control while casting
+// Unlike VLC 3.0, VLC 4.0 cannot control playback with keyboard while casting
+- (void)keyDown:(NSEvent *)event
+{
+	NSLog(@"--- LW: keyDown: ");
+
+    VLCPlayerController * pc = [[[VLCMain sharedInstance] playlistController] playerController];
+    switch( [event keyCode] ) {
+        // case 126:       // up arrow
+        // case 125:       // down arrow
+        case 124:       // right arrow
+            [pc jumpForwardExtraShort];
+	        NSLog(@"--- LW: R");
+            break;
+        case 123:       // left arrow
+            [pc jumpBackwardExtraShort];
+	        NSLog(@"--- LW: L");
+            break;
+        case 49:        // space
+            [pc togglePlayPause]; 
+            break;            
+        default:            
+            break;
+    }
+}
+
 - (void)awakeFromNib
 {
     VLCMain *mainInstance = [VLCMain sharedInstance];
@@ -178,7 +204,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     [_segmentedTitleControl setAction:@selector(segmentedControlAction:)];
     [_segmentedTitleControl setLabel:_NS("Video") forSegment:0];
     [_segmentedTitleControl setLabel:_NS("Music") forSegment:1];
-    [_segmentedTitleControl setLabel:_NS("Local Network") forSegment:2];
+    [_segmentedTitleControl setLabel:_NS("Local Network -- ") forSegment:2];
     [_segmentedTitleControl setLabel:_NS("Internet") forSegment:3];
     [_segmentedTitleControl sizeToFit];
     [_segmentedTitleControl setSelectedSegment:0];
@@ -245,7 +271,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     [_mediaSourceDataSource setupViews];
 
     self.upNextLabel.font = [NSFont VLClibrarySectionHeaderFont];
-    self.upNextLabel.stringValue = _NS("Playlist");
+    self.upNextLabel.stringValue = _NS("Playlist --");
     [self updateColorsBasedOnAppearance];
     self.openMediaButton.title = _NS("Open media...");
 
